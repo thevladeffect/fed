@@ -1,0 +1,3 @@
+include ':app', ':ParseUI-Login', ':ParseUI-Widget'
+project(':ParseUI-Login').projectDir = new File('app/libs/ParseUI-Android/ParseUI-Login')
+project(':ParseUI-Widget').projectDir = new File('app/libs/ParseUI-Android/ParseUI-Widget')
