@@ -6,21 +6,18 @@ package io.fed.mobile.fedio;
 public class Entry {
 
     private int itemId;
-    private String createdBy, itemName, timeOfDay;
+    private String  itemName, timeOfDay;
+    private double dose;
 
-    public Entry(int itemId, String createdBy, String itemName, String timeOfDay){
+    public Entry(int itemId, String itemName, String timeOfDay, double dose){
         this.itemId = itemId;
-        this.createdBy = createdBy;
         this.itemName = itemName;
         this.timeOfDay = timeOfDay;
+        this.dose = dose;
     }
 
     public int getItemId() {
         return itemId;
-    }
-
-    public String getCreatedBy() {
-        return createdBy;
     }
 
     public String getItemName() {
@@ -29,5 +26,9 @@ public class Entry {
 
     public String getTimeOfDay() {
         return timeOfDay;
+    }
+
+    public double getDose(){
+        return dose;
     }
 }
