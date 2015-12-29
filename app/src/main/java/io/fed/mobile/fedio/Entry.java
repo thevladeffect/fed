@@ -31,4 +31,14 @@ public class Entry {
     public double getDose(){
         return dose;
     }
+
+    @Override
+    public String toString() {
+        return "Entry{" +
+                "itemId=" + itemId +
+                ", itemName='" + itemName + '\'' +
+                ", timeOfDay='" + timeOfDay + '\'' +
+                ", dose=" + dose +
+                '}';
+    }
 }

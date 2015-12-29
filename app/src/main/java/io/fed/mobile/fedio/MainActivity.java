@@ -1,16 +1,15 @@
 package io.fed.mobile.fedio;
 
-import android.app.Activity;
 import android.app.ListActivity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import com.parse.Parse;
@@ -22,26 +21,25 @@ import com.parse.ParseUser;
 import com.parse.ui.ParseLoginBuilder;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
 
 public class MainActivity extends ListActivity {
 
     private final int LIST_ITEM_TYPE_HEADER = 0;
     private final int LIST_ITEM_TYPE_CONTENT = 1;
+    @SuppressWarnings("FieldCanBeLocal")
     private final int LIST_ITEM_TYPE_COUNT = 2;
 
-    // TODO remove
-    private final int LIST_ITEM_TYPE_1_COUNT = 5;
-
     private final int RES = 1;
-    private ParseObject userData;
-    private List<Entry> entries;
 
     private CustomListAdapter adapter;
 
     private class CustomListAdapter extends BaseAdapter {
 
-        private ArrayList<String> mData = new ArrayList<String>();
+        private ArrayList<String> mData = new ArrayList<>();
         private LayoutInflater mInflater;
 
         public CustomListAdapter() {
@@ -56,7 +54,7 @@ public class MainActivity extends ListActivity {
         @Override
         public int getItemViewType(int position) {
             String content = getItem(position);
-            if(!content.contains("***"))
+            if(!content.contains(" - "))
                 return LIST_ITEM_TYPE_HEADER;
             else
                 return LIST_ITEM_TYPE_CONTENT;
@@ -84,7 +82,7 @@ public class MainActivity extends ListActivity {
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-            ViewHolder holder = null;
+            ViewHolder holder;
             int type = getItemViewType(position);
             if (convertView == null) {
                 holder = new ViewHolder();
@@ -98,6 +96,7 @@ public class MainActivity extends ListActivity {
                         holder.textView = (TextView)convertView.findViewById(R.id.list_item_type2_button);
                         break;
                 }
+                assert convertView != null;
                 convertView.setTag(holder);
             } else {
                 holder = (ViewHolder)convertView.getTag();
@@ -129,32 +128,102 @@ public class MainActivity extends ListActivity {
 
         // create and populate adapter
         adapter = new CustomListAdapter();
-        for(Entry entry : getEntries(ParseUser.getCurrentUser().getUsername())){
-            String item = entry.getItemId() == -1 ? entry.getTimeOfDay() : entry.getItemName() + "***" + entry.getDose()*getDoseEnergy(entry.getItemName()) + "***" +entry.getTimeOfDay();
+        if(ParseUser.getCurrentUser() != null)
+        for(Entry entry : getEntries(ParseUser.getCurrentUser().getUsername(),new Date())){
+            String item = entry.getItemId() == -1 ? entry.getTimeOfDay() : entry.getItemName() + " - " + entry.getDose()*getDoseEnergy(entry.getItemName());
             adapter.addItem(item);
         }
         setListAdapter(adapter);
 
     }
 
-    private ArrayList<Entry> getEntries(String user){
-        ArrayList<Entry> list = new ArrayList<Entry>();
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu, menu);
+        return true;
+    }
 
-        // TODO get actual data from Parse for @user
+    // returns the diary entries for the @user on the @date
+    private ArrayList<Entry> getEntries(String user, Date date){
 
-        list.add(new Entry(-1,"","breakfast",0));
-        list.add(new Entry(1,"Banana","breakfast", 1.0));
-        list.add(new Entry(2,"Coffee","breakfast",1.0));
-        list.add(new Entry(-1,"","lunch",0));
-        list.add(new Entry(3,"BLT","lunch",0.75));
-        list.add(new Entry(4,"Coke","lunch",0.33));
-        list.add(new Entry(-1,"","dinner",0));
-        list.add(new Entry(5,"French toast","dinner",2.0));
+        class CustomEntrySorter implements Comparator<Entry> {
+
+            @Override
+            public int compare(Entry lhs, Entry rhs) {
+                switch (lhs.getTimeOfDay()) {
+                    case "breakfast":
+                        if (!rhs.getTimeOfDay().equals("breakfast")) return -1;
+                        break;
+                    case "lunch":
+                        if (rhs.getTimeOfDay().equals("breakfast")) return 1;
+                        else if (rhs.getTimeOfDay().equals("dinner")) return -1;
+                        break;
+                    case "dinner":
+                        if (!rhs.getTimeOfDay().equals("dinner")) return 1;
+                        break;
+                }
+                return 0;
+            }
+        }
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+
+        calendar.set(Calendar.HOUR, 0);
+        calendar.set(Calendar.MINUTE,0);
+        calendar.set(Calendar.SECOND,0);
+
+        Date begin = calendar.getTime();
+
+        calendar.set(Calendar.DAY_OF_YEAR, calendar.get(Calendar.DAY_OF_YEAR)+1);
+
+        Date end = calendar.getTime();
+
+        final ArrayList<Entry> list = new ArrayList<>();
+
+        ParseQuery<ParseObject> query = ParseQuery.getQuery("UserData");
+        query.whereEqualTo("createdBy", user);
+        query.whereGreaterThanOrEqualTo("createdAt", begin);
+        query.whereLessThan("createdAt", end);
+        query.addAscendingOrder("createdAt");
+        try {
+            for (ParseObject entry : query.find()) {
+                list.add(new Entry(entry.getInt("itemId"), entry.getString("itemName"),
+                        entry.getString("timeOfDay"), entry.getDouble("dose")));
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        Collections.sort(list, new CustomEntrySorter());
+
+        if(getIndexOf("breakfast",list) != -1)
+            list.add(getIndexOf("breakfast", list), new Entry(-1, "", "Breakfast", 0));
+
+        if(getIndexOf("lunch",list) != -1)
+            list.add(getIndexOf("lunch",list),new Entry(-1,"","Lunch",0));
+
+        if(getIndexOf("dinner",list) != -1)
+            list.add(getIndexOf("dinner",list),new Entry(-1,"","Dinner",0));
+
+        double totalCalories = 0.00;
+        for(Entry entry : list) totalCalories += entry.getDose() * getDoseEnergy(entry.getItemName());
+        list.add(new Entry(-1,"","Total calories: " + totalCalories,0));
 
         return list;
     }
 
-    private double getDoseEnergy(String item){
+    // returns the index of the entry with @timeOfDay in @list
+    private int getIndexOf(String timeOfDay, ArrayList<Entry> list){
+        for(Entry entry : list){
+            if(entry.getTimeOfDay().equals(timeOfDay)) return list.indexOf(entry);
+        }
+        return -1;
+    }
+
+    // returns the number of calories per dose for @item
+    private double getDoseEnergy(@SuppressWarnings("UnusedParameters") String item){
 
         // TODO return calories per dose for @item
 
@@ -166,7 +235,7 @@ public class MainActivity extends ListActivity {
         if(requestCode == RES){
             if(resultCode == RESULT_OK){
                 // populate adapter
-                for(Entry entry : getEntries(ParseUser.getCurrentUser().getUsername())){
+                for(Entry entry : getEntries(ParseUser.getCurrentUser().getUsername(), new Date())){
                     String item = entry.getItemId() == -1 ? entry.getTimeOfDay() : entry.getItemName() + "***" + entry.getDose()*getDoseEnergy(entry.getItemName()) + "***" +entry.getTimeOfDay();
                     adapter.addItem(item);
                 }
