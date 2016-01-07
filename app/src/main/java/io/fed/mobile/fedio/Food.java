@@ -8,10 +8,7 @@ import java.util.ArrayList;
 public class Food {
 
     // will return a list of foods matching the @keyword parameter
-    public static ArrayList<String> getResults(String keyword){
-        // format of returned entries in the array list:
-        // NAME_OF_ENTRY***NO_OF_CALORIES_FOR_ONE_DOSE***QUANTITY_IN_ONE_DOSE
-        // string formatting will be done during use
+    public static ArrayList<Entry> getResults(String keyword){
         return null;
     }
 

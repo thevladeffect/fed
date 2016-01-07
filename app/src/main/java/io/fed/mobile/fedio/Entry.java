@@ -7,13 +7,19 @@ public class Entry {
 
     private int itemId;
     private String  itemName, timeOfDay;
-    private double dose;
+    private double dose, caloriesPerDose;
 
-    public Entry(int itemId, String itemName, String timeOfDay, double dose){
+
+    public Entry(int itemId, String itemName, String timeOfDay, double dose, double caloriesPerDose){
         this.itemId = itemId;
         this.itemName = itemName;
         this.timeOfDay = timeOfDay;
         this.dose = dose;
+        this.caloriesPerDose = caloriesPerDose;
+    }
+
+    public double getCaloriesPerDose() {
+        return caloriesPerDose;
     }
 
     public int getItemId() {

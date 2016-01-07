@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -130,7 +131,7 @@ public class MainActivity extends ListActivity {
         adapter = new CustomListAdapter();
         if(ParseUser.getCurrentUser() != null)
         for(Entry entry : getEntries(ParseUser.getCurrentUser().getUsername(),new Date())){
-            String item = entry.getItemId() == -1 ? entry.getTimeOfDay() : entry.getItemName() + " - " + entry.getDose()*getDoseEnergy(entry.getItemName());
+            String item = entry.getItemId() == -1 ? entry.getTimeOfDay() : entry.getItemName() + " - " + entry.getDose()*entry.getCaloriesPerDose();
             adapter.addItem(item);
         }
         setListAdapter(adapter);
@@ -143,6 +144,19 @@ public class MainActivity extends ListActivity {
         inflater.inflate(R.menu.menu, menu);
         return true;
     }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_favorite:
+                Intent myIntent = new Intent(this,AddMealActivity.class);
+                startActivity(myIntent);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
 
     // returns the diary entries for the @user on the @date
     private ArrayList<Entry> getEntries(String user, Date date){
@@ -190,7 +204,7 @@ public class MainActivity extends ListActivity {
         try {
             for (ParseObject entry : query.find()) {
                 list.add(new Entry(entry.getInt("itemId"), entry.getString("itemName"),
-                        entry.getString("timeOfDay"), entry.getDouble("dose")));
+                        entry.getString("timeOfDay"), entry.getDouble("dose"), entry.getDouble("caloriesPerDose")));
             }
         } catch (ParseException e) {
             e.printStackTrace();
@@ -199,17 +213,17 @@ public class MainActivity extends ListActivity {
         Collections.sort(list, new CustomEntrySorter());
 
         if(getIndexOf("breakfast",list) != -1)
-            list.add(getIndexOf("breakfast", list), new Entry(-1, "", "Breakfast", 0));
+            list.add(getIndexOf("breakfast", list), new Entry(-1, "", "Breakfast", 0, 0));
 
         if(getIndexOf("lunch",list) != -1)
-            list.add(getIndexOf("lunch",list),new Entry(-1,"","Lunch",0));
+            list.add(getIndexOf("lunch",list),new Entry(-1,"","Lunch",0, 0));
 
         if(getIndexOf("dinner",list) != -1)
-            list.add(getIndexOf("dinner",list),new Entry(-1,"","Dinner",0));
+            list.add(getIndexOf("dinner",list),new Entry(-1,"","Dinner",0, 0));
 
         double totalCalories = 0.00;
-        for(Entry entry : list) totalCalories += entry.getDose() * getDoseEnergy(entry.getItemName());
-        list.add(new Entry(-1,"","Total calories: " + totalCalories,0));
+        for(Entry entry : list) totalCalories += entry.getDose() * entry.getCaloriesPerDose();
+        list.add(new Entry(-1,"","Total calories: " + totalCalories,0, 0));
 
         return list;
     }
@@ -222,21 +236,13 @@ public class MainActivity extends ListActivity {
         return -1;
     }
 
-    // returns the number of calories per dose for @item
-    private double getDoseEnergy(@SuppressWarnings("UnusedParameters") String item){
-
-        // TODO return calories per dose for @item
-
-        return 400.00;
-    }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if(requestCode == RES){
             if(resultCode == RESULT_OK){
                 // populate adapter
                 for(Entry entry : getEntries(ParseUser.getCurrentUser().getUsername(), new Date())){
-                    String item = entry.getItemId() == -1 ? entry.getTimeOfDay() : entry.getItemName() + "***" + entry.getDose()*getDoseEnergy(entry.getItemName()) + "***" +entry.getTimeOfDay();
+                    String item = entry.getItemId() == -1 ? entry.getTimeOfDay() : entry.getItemName() + "***" + entry.getDose()*entry.getCaloriesPerDose() + "***" +entry.getTimeOfDay();
                     adapter.addItem(item);
                 }
                 adapter.notifyDataSetChanged();
