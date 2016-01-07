@@ -6,4 +6,20 @@
 
     <string name="twitter_consumer_key">RaFsIE4LYfLNkOLpygISJZOoy</string>
     <string name="twitter_consumer_secret">UO3qtjGuy4Ps8Z97z5dXoVnjMX8ALM83xlcNEjtcVFJeLx3IW2</string>
+    <string name="title_activity_add_meal">AddMeal</string>
+
+    <string-array name="mealtime">
+        <item>Breakfast</item>
+        <item>Lunch</item>
+        <item>Dinner</item>
+        <item>Snack1</item>
+        <item>Snack2</item>
+    </string-array>
+
+    <string-array name="unitofmeasure">
+        <item>Liter</item>
+        <item>Grams</item>
+        <item>Milliliters</item>
+    </string-array>
+    <string name="title_activity_search">SearchActivity</string>
 </resources>
