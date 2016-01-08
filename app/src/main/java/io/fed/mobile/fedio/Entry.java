@@ -6,6 +6,7 @@ package io.fed.mobile.fedio;
 public class Entry {
 
     private int itemId;
+
     private String  itemName, timeOfDay;
     private double dose, caloriesPerDose;
 
@@ -18,9 +19,30 @@ public class Entry {
         this.caloriesPerDose = caloriesPerDose;
     }
 
-    public double getCaloriesPerDose() {
-        return caloriesPerDose;
+    public Entry(){}
+
+
+    public void setItemId(int itemId) {
+        this.itemId = itemId;
     }
+
+    public void setItemName(String itemName) {
+        this.itemName = itemName;
+    }
+
+    public void setTimeOfDay(String timeOfDay) {
+        this.timeOfDay = timeOfDay;
+    }
+
+    public void setDose(double dose) {
+        this.dose = dose;
+    }
+
+    public void setCaloriesPerDose(double caloriesPerDose) {
+        this.caloriesPerDose = caloriesPerDose;
+    }
+
+
 
     public int getItemId() {
         return itemId;
@@ -37,6 +59,12 @@ public class Entry {
     public double getDose(){
         return dose;
     }
+
+    public double getCaloriesPerDose() {
+        return caloriesPerDose;
+    }
+
+
 
     @Override
     public String toString() {

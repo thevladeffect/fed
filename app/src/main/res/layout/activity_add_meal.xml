@@ -65,7 +65,7 @@
             android:id="@+id/button"
             android:layout_gravity="center_horizontal"
             android:nestedScrollingEnabled="false"
-            android:onClick="buttonOnClick" />
+            android:onClick="acceptButtonClick" />
 
 
     </LinearLayout>

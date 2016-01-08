@@ -31,10 +31,8 @@ public class MainActivity extends ListActivity {
 
     private final int LIST_ITEM_TYPE_HEADER = 0;
     private final int LIST_ITEM_TYPE_CONTENT = 1;
-    @SuppressWarnings("FieldCanBeLocal")
-    private final int LIST_ITEM_TYPE_COUNT = 2;
 
-    private final int RES = 1;
+    public static final int RES = 1;
 
     private CustomListAdapter adapter;
 
@@ -63,7 +61,7 @@ public class MainActivity extends ListActivity {
 
         @Override
         public int getViewTypeCount() {
-            return LIST_ITEM_TYPE_COUNT;
+            return 2;
         }
 
         @Override
@@ -150,7 +148,7 @@ public class MainActivity extends ListActivity {
         switch (item.getItemId()) {
             case R.id.action_favorite:
                 Intent myIntent = new Intent(this,AddMealActivity.class);
-                startActivity(myIntent);
+                startActivityForResult(myIntent, RES);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -241,19 +239,12 @@ public class MainActivity extends ListActivity {
         if(requestCode == RES){
             if(resultCode == RESULT_OK){
                 // populate adapter
+                adapter = new CustomListAdapter();
                 for(Entry entry : getEntries(ParseUser.getCurrentUser().getUsername(), new Date())){
-                    String item = entry.getItemId() == -1 ? entry.getTimeOfDay() : entry.getItemName() + "***" + entry.getDose()*entry.getCaloriesPerDose() + "***" +entry.getTimeOfDay();
+                    String item = entry.getItemId() == -1 ? entry.getTimeOfDay() : entry.getItemName() + " - " + entry.getDose()*entry.getCaloriesPerDose();
                     adapter.addItem(item);
                 }
-                adapter.notifyDataSetChanged();
-
-                // adding data to custom parse table
-
-//                userData = new ParseObject("UserData");
-//                userData.put("itemId",1);
-//                userData.put("itemName","Banana");
-//                userData.put("createdBy", ParseUser.getCurrentUser().getUsername());
-//                userData.saveInBackground();
+                setListAdapter(adapter);
 
             }
         }
