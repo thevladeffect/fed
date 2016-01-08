@@ -30,7 +30,7 @@
         <Spinner
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/spinner"
+            android:id="@+id/spinnerTimeOfDay"
             android:entries="@array/mealtime"/>
 
         <LinearLayout
@@ -38,7 +38,8 @@
             android:layout_width="match_parent"
             android:layout_height="49dp"
             android:layout_alignParentTop="true"
-            android:layout_centerHorizontal="true">
+            android:layout_centerHorizontal="true"
+            android:weightSum="1">
 
             <EditText
                 android:layout_width="188dp"
@@ -47,12 +48,14 @@
                 android:ems="10"
                 android:id="@+id/editText" />
 
-            <Spinner
-                android:layout_width="167dp"
+            <TextView
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/spinner2"
-                android:layout_gravity="right"
-                android:entries="@array/unitofmeasure"/>
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="Medium Text"
+                android:id="@+id/textViewDose"
+                android:layout_weight="0.69" />
+
         </LinearLayout>
 
         <Button
