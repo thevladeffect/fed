@@ -93,8 +93,7 @@ public class AddMealActivity extends Activity {
     }
 
     private int generateUniqueId(String seed){
-        // TODO --- implement
-        return 12;
+        return seed.hashCode();
     };
 
     public void acceptButtonClick(View v){
