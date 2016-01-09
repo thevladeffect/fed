@@ -1,7 +1,9 @@
 package io.fed.mobile.fedio;
 
+import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -11,7 +13,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.parse.Parse;
 import com.parse.ParseException;
@@ -39,6 +43,7 @@ public class MainActivity extends ListActivity {
     private CustomListAdapter adapter;
 
     private Date date;
+    private Context context = this;
 
     private class CustomListAdapter extends BaseAdapter {
 
@@ -97,6 +102,27 @@ public class MainActivity extends ListActivity {
                     case LIST_ITEM_TYPE_CONTENT:
                         convertView = mInflater.inflate(R.layout.list_item_type_content, null);
                         holder.textView = (TextView)convertView.findViewById(R.id.list_item_type2_button);
+                        holder.textView.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                Button b = (Button) v;
+                                final String name = b.getText().toString().split(" - ")[0];
+                                final String calories = b.getText().toString().split(" - ")[1];
+
+                                new AlertDialog.Builder(context)
+                                        .setTitle("Delete confirmation")
+                                        .setMessage("Do you wish to delete this diary entry?")
+                                        .setIcon(android.R.drawable.ic_dialog_alert)
+                                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+
+                                            public void onClick(DialogInterface dialog, int whichButton) {
+                                                deleteEntry(name, calories);
+                                            }
+                                        })
+                                        .setNegativeButton(android.R.string.no, null).show();
+
+                            }
+                        });
                         break;
                 }
                 assert convertView != null;
@@ -133,6 +159,46 @@ public class MainActivity extends ListActivity {
         adapter = new CustomListAdapter();
         if(date == null) date = new Date();
         if(ParseUser.getCurrentUser() != null)
+        for(Entry entry : getEntries(ParseUser.getCurrentUser().getUsername(), date)){
+            String item = entry.getItemId() == -1 ? entry.getTimeOfDay() : entry.getItemName() + " - " + entry.getDose()*entry.getCaloriesPerDose();
+            adapter.addItem(item);
+        }
+        setListAdapter(adapter);
+
+    }
+
+    private void deleteEntry(String name, String calories){
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+
+        calendar.set(Calendar.HOUR, 0);
+        calendar.set(Calendar.MINUTE,0);
+        calendar.set(Calendar.SECOND,0);
+
+        Date begin = calendar.getTime();
+
+        calendar.set(Calendar.DAY_OF_YEAR, calendar.get(Calendar.DAY_OF_YEAR)+1);
+
+        Date end = calendar.getTime();
+
+        final ArrayList<Entry> list = new ArrayList<>();
+
+        ParseQuery<ParseObject> query = ParseQuery.getQuery("UserData");
+        query.whereEqualTo("itemName", name);
+        query.whereEqualTo("createdBy", ParseUser.getCurrentUser().getUsername());
+        query.whereGreaterThanOrEqualTo("createdFor", begin);
+        query.whereLessThan("createdFor", end);
+        query.addAscendingOrder("createdFor");
+
+        try {
+            for (ParseObject entry : query.find()) {
+                entry.delete();
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        adapter = new CustomListAdapter();
         for(Entry entry : getEntries(ParseUser.getCurrentUser().getUsername(), date)){
             String item = entry.getItemId() == -1 ? entry.getTimeOfDay() : entry.getItemName() + " - " + entry.getDose()*entry.getCaloriesPerDose();
             adapter.addItem(item);
@@ -310,6 +376,8 @@ public class MainActivity extends ListActivity {
         }
         setListAdapter(adapter);
     }
+
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
