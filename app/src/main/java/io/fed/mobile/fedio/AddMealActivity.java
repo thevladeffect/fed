@@ -22,6 +22,7 @@ import com.parse.ParseObject;
 import com.parse.ParseUser;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 public class AddMealActivity extends Activity {
 
@@ -77,7 +78,7 @@ public class AddMealActivity extends Activity {
                 lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     public void onItemClick(AdapterView<?> myAdapter, View myView, int myItemInt, long mylng) {
                         meal = (Entry) (lv.getItemAtPosition(myItemInt));
-                        // TODO --- color selected item in the list so that it looks selected
+                        // TODO --- color the selected item in the list so that it looks "selected"
                     }
                 });
 
@@ -91,7 +92,10 @@ public class AddMealActivity extends Activity {
         });
     }
 
-
+    private int generateUniqueId(String seed){
+        // TODO --- implement
+        return 12;
+    };
 
     public void acceptButtonClick(View v){
 
@@ -102,9 +106,7 @@ public class AddMealActivity extends Activity {
 
         meal.setTimeOfDay(timeOfDayTxt);
         meal.setDose(doseValue);
-
-        // TODO --- unique id
-        meal.setItemId(12);
+        meal.setItemId(generateUniqueId(meal.getItemName() + new Date()));
 
         ParseObject userData = new ParseObject("UserData");
 
