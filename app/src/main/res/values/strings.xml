@@ -8,6 +8,9 @@
     <string name="twitter_consumer_secret">UO3qtjGuy4Ps8Z97z5dXoVnjMX8ALM83xlcNEjtcVFJeLx3IW2</string>
     <string name="title_activity_add_meal">Add new meal</string>
 
+    <string name="left">&lt;</string>
+    <string name="right">&gt;</string>
+
     <string-array name="mealtime">
         <item>Breakfast</item>
         <item>Lunch</item>

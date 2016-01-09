@@ -115,6 +115,10 @@ public class AddMealActivity extends Activity {
         userData.put("dose", meal.getDose());
         userData.put("caloriesPerDose", meal.getCaloriesPerDose());
         userData.put("createdBy", ParseUser.getCurrentUser().getUsername());
+        Intent intent = getIntent();
+        Date date = new Date(intent.getLongExtra("date",0));
+        userData.put("createdFor", date);
+
 
         try {
             userData.save();

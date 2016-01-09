@@ -14,6 +14,28 @@
         android:orientation="vertical"
         >
 
+        <TableLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:stretchColumns="*">
+
+            <TableRow>
+                <Button
+                    android:id="@+id/left"
+                    android:text="@string/left"
+                    android:onClick="leftButtonClick" />
+                <TextView
+                    android:id="@+id/date"
+                    android:text="Today"
+                    android:textAlignment="center" />
+                <Button
+                    android:id="@+id/right"
+                    android:text="@string/right"
+                    android:onClick="rightButtonClick" />
+            </TableRow>
+
+        </TableLayout>
+
         <ListView
             android:id="@android:id/list"
             android:layout_width="match_parent"

@@ -21,6 +21,8 @@ import com.parse.ParseTwitterUtils;
 import com.parse.ParseUser;
 import com.parse.ui.ParseLoginBuilder;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -35,6 +37,8 @@ public class MainActivity extends ListActivity {
     public static final int RES = 1;
 
     private CustomListAdapter adapter;
+
+    private Date date;
 
     private class CustomListAdapter extends BaseAdapter {
 
@@ -127,8 +131,9 @@ public class MainActivity extends ListActivity {
 
         // create and populate adapter
         adapter = new CustomListAdapter();
+        if(date == null) date = new Date();
         if(ParseUser.getCurrentUser() != null)
-        for(Entry entry : getEntries(ParseUser.getCurrentUser().getUsername(),new Date())){
+        for(Entry entry : getEntries(ParseUser.getCurrentUser().getUsername(), date)){
             String item = entry.getItemId() == -1 ? entry.getTimeOfDay() : entry.getItemName() + " - " + entry.getDose()*entry.getCaloriesPerDose();
             adapter.addItem(item);
         }
@@ -148,6 +153,7 @@ public class MainActivity extends ListActivity {
         switch (item.getItemId()) {
             case R.id.action_favorite:
                 Intent myIntent = new Intent(this,AddMealActivity.class);
+                myIntent.putExtra("date",date.getTime());
                 startActivityForResult(myIntent, RES);
                 return true;
             default:
@@ -196,9 +202,9 @@ public class MainActivity extends ListActivity {
 
         ParseQuery<ParseObject> query = ParseQuery.getQuery("UserData");
         query.whereEqualTo("createdBy", user);
-        query.whereGreaterThanOrEqualTo("createdAt", begin);
-        query.whereLessThan("createdAt", end);
-        query.addAscendingOrder("createdAt");
+        query.whereGreaterThanOrEqualTo("createdFor", begin);
+        query.whereLessThan("createdFor", end);
+        query.addAscendingOrder("createdFor");
         try {
             for (ParseObject entry : query.find()) {
                 list.add(new Entry(entry.getInt("itemId"), entry.getString("itemName"),
@@ -226,6 +232,55 @@ public class MainActivity extends ListActivity {
         return list;
     }
 
+    private void setDateText(){
+        TextView dateText = (TextView) findViewById(R.id.date);
+        String formattedDate = "";
+        DateFormat df = new SimpleDateFormat("E, dd MMMM yyyy");
+
+        Calendar c1 = Calendar.getInstance();
+        c1.add(Calendar.DAY_OF_YEAR, -1); // yesterday
+
+        Calendar c2 = Calendar.getInstance(); // today
+
+        Calendar c3 = Calendar.getInstance();
+        c3.add(Calendar.DAY_OF_YEAR, 1); // tomorrow
+
+        Calendar c4 = Calendar.getInstance();
+        c4.setTime(date);
+
+        if (c1.get(Calendar.YEAR) == c4.get(Calendar.YEAR)
+                && c1.get(Calendar.DAY_OF_YEAR) == c4.get(Calendar.DAY_OF_YEAR)) {
+            formattedDate = "Yesterday";
+        }
+        else if (c2.get(Calendar.YEAR) == c4.get(Calendar.YEAR)
+                && c2.get(Calendar.DAY_OF_YEAR) == c4.get(Calendar.DAY_OF_YEAR)){
+            formattedDate = "Today";
+        }
+        else if (c3.get(Calendar.YEAR) == c4.get(Calendar.YEAR)
+                && c3.get(Calendar.DAY_OF_YEAR) == c4.get(Calendar.DAY_OF_YEAR)){
+            formattedDate = "Tomorrow";
+        }
+        else{
+            formattedDate = df.format(date);
+        }
+
+        dateText.setText(formattedDate);
+    }
+
+    private void increaseDate(){
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        calendar.add(Calendar.DATE, 1);
+        date = calendar.getTime();
+    }
+
+    private void decreaseDate(){
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        calendar.add(Calendar.DATE, -1);
+        date = calendar.getTime();
+    }
+
     // returns the index of the entry with @timeOfDay in @list
     private int getIndexOf(String timeOfDay, ArrayList<Entry> list){
         for(Entry entry : list){
@@ -234,13 +289,36 @@ public class MainActivity extends ListActivity {
         return -1;
     }
 
+    public void leftButtonClick(View v){
+        adapter = new CustomListAdapter();
+        decreaseDate();
+        setDateText();
+        for(Entry entry : getEntries(ParseUser.getCurrentUser().getUsername(), date)){
+            String item = entry.getItemId() == -1 ? entry.getTimeOfDay() : entry.getItemName() + " - " + entry.getDose()*entry.getCaloriesPerDose();
+            adapter.addItem(item);
+        }
+        setListAdapter(adapter);
+    }
+
+    public void rightButtonClick(View v){
+        adapter = new CustomListAdapter();
+        increaseDate();
+        setDateText();
+        for(Entry entry : getEntries(ParseUser.getCurrentUser().getUsername(), date)){
+            String item = entry.getItemId() == -1 ? entry.getTimeOfDay() : entry.getItemName() + " - " + entry.getDose()*entry.getCaloriesPerDose();
+            adapter.addItem(item);
+        }
+        setListAdapter(adapter);
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if(requestCode == RES){
             if(resultCode == RESULT_OK){
                 // populate adapter
                 adapter = new CustomListAdapter();
-                for(Entry entry : getEntries(ParseUser.getCurrentUser().getUsername(), new Date())){
+                if(date == null) date = new Date();
+                for(Entry entry : getEntries(ParseUser.getCurrentUser().getUsername(), date)){
                     String item = entry.getItemId() == -1 ? entry.getTimeOfDay() : entry.getItemName() + " - " + entry.getDose()*entry.getCaloriesPerDose();
                     adapter.addItem(item);
                 }
