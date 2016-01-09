@@ -31,7 +31,7 @@ public class AddMealActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
-        SearchView search;
+        final SearchView search;
 
         class EntryAdapter extends ArrayAdapter<Entry> {
             public EntryAdapter(Context context, ArrayList<Entry> users) {
@@ -65,6 +65,8 @@ public class AddMealActivity extends Activity {
 
         search = (SearchView) findViewById(R.id.searchView1);
 
+        search.setIconifiedByDefault(false);
+
         search.setOnQueryTextListener(new OnQueryTextListener() {
 
             @Override
@@ -75,9 +77,12 @@ public class AddMealActivity extends Activity {
                 EntryAdapter adapter = new EntryAdapter(context, results);
                 lv.setAdapter(adapter);
 
+                search.clearFocus();
+
                 lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     public void onItemClick(AdapterView<?> myAdapter, View myView, int myItemInt, long mylng) {
                         meal = (Entry) (lv.getItemAtPosition(myItemInt));
+                        myView.setSelected(true);
                         // TODO --- color the selected item in the list so that it looks "selected"
                     }
                 });
@@ -116,7 +121,7 @@ public class AddMealActivity extends Activity {
         userData.put("caloriesPerDose", meal.getCaloriesPerDose());
         userData.put("createdBy", ParseUser.getCurrentUser().getUsername());
         Intent intent = getIntent();
-        Date date = new Date(intent.getLongExtra("date",0));
+        Date date = new Date(intent.getLongExtra("date", 0));
         userData.put("createdFor", date);
 
 

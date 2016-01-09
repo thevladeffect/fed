@@ -17,55 +17,77 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/searchView1"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentTop="true"
             android:queryHint="Search..." />
+
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="1dp"
+            android:background="@color/colorPrimaryDark"/>
+
         <ListView
             android:layout_width="match_parent"
             android:layout_height="250dp"
             android:id="@+id/listView"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentTop="true"/>
+            android:listSelector="@color/colorPrimaryDark"/>
+
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="1dp"
+            android:background="@color/colorPrimaryDark"/>
 
         <Spinner
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/spinnerTimeOfDay"
-            android:entries="@array/mealtime"/>
+            android:entries="@array/mealtime"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:padding="15dp"/>
 
-        <LinearLayout
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="1dp"
+            android:background="@color/colorPrimaryDark"/>
+
+        <TableLayout
             android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="49dp"
-            android:layout_alignParentTop="true"
-            android:layout_centerHorizontal="true"
-            android:weightSum="1">
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:stretchColumns="0"
+            android:padding="10dp">
 
-            <EditText
-                android:layout_width="188dp"
-                android:layout_height="wrap_content"
-                android:inputType="number"
-                android:ems="10"
-                android:id="@+id/editText" />
+            <TableRow>
+                <EditText
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:inputType="numberDecimal"
+                    android:ems="10"
+                    android:id="@+id/editText"
+                    android:layout_weight="0"/>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="Medium Text"
-                android:id="@+id/textViewDose"
-                android:layout_weight="0.69" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="  x 100 grams"
+                    android:id="@+id/textViewDose"
+                    android:textColor="@color/colorText"
+                    android:layout_weight="0" />
+            </TableRow>
 
-        </LinearLayout>
+
+        </TableLayout>
 
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Accept"
+            android:text="ACCEPT"
             android:id="@+id/button"
             android:layout_gravity="center_horizontal"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textStyle="bold"
             android:nestedScrollingEnabled="false"
-            android:onClick="acceptButtonClick" />
+            android:onClick="acceptButtonClick"
+            android:padding="20dp"/>
 
 
     </LinearLayout>

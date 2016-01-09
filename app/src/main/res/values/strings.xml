@@ -12,15 +12,10 @@
     <string name="right">&gt;</string>
 
     <string-array name="mealtime">
+        <item>When did you eat this?</item>
         <item>Breakfast</item>
         <item>Lunch</item>
         <item>Dinner</item>
-    </string-array>
-
-    <string-array name="unitofmeasure">
-        <item>Liter</item>
-        <item>Grams</item>
-        <item>Milliliters</item>
     </string-array>
 
 </resources>

@@ -2,14 +2,34 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
-    <TextView
-        android:id="@+id/itemName"
+    <TableLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Name" />
-    <TextView
-        android:id="@+id/caloriesPerDose"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="HomeTown" />
+        android:stretchColumns="0"
+        android:padding="10dp">
+
+        <TableRow>
+
+            <TextView
+                android:id="@+id/itemName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Name"
+                android:textColor="@color/colorText"
+                android:textSize="15sp"
+                android:layout_weight="1"
+                android:textStyle="bold"/>
+
+            <TextView
+                android:id="@+id/caloriesPerDose"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Calories"
+                android:textColor="@color/colorAccent"
+                android:textSize="18sp"
+                android:layout_weight="0"
+                android:textStyle="bold"/>
+        </TableRow>
+    </TableLayout>
+
 </LinearLayout>
